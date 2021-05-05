@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="Syntax_Analyser">
+    <output-path>$PROJECT_DIR$/out/artifacts/Syntax_Analyser</output-path>
+    <root id="archive" name="Syntax_Analyser.jar">
+      <element id="module-output" name="Syntax_Analyser" />
+      <element id="archive" name="archive.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
