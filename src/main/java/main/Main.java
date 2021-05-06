@@ -10,9 +10,15 @@ import java.io.*;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
-        var a = new Analyser().loadFile("skuska.txt");
+    public static void main(String[] args) {
+        Analyser analyser = new Analyser();
+        String fileName = "skuska.txt";
+        boolean isOk;
 
+        if(analyser.loadFile(fileName)) {
+            isOk = analyser.analyse();
+            System.out.println("Subor: " +  fileName + " je: " + isOk );
+        }
     }
 
 }

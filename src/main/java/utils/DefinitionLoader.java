@@ -46,6 +46,7 @@ public class DefinitionLoader {
             // in csv real semicolon could not be used and was placehold with "SEMI"
             for(int i = 0; i < currLine.length; i++) {
                 currLine[i] = currLine[i].replaceAll("SEMI", ";");
+                currLine[i] = currLine[i].replaceAll("~", "-");
             }
 
             parsedLines.add(currLine);
@@ -67,7 +68,8 @@ public class DefinitionLoader {
                 // we have no rules here
                 if(currToken.isEmpty() || currToken.isBlank()) continue;
 
-                List<String> rules = Arrays.asList(currToken.split("\\s+"));
+                List<String> rules = Arrays.asList(currToken.trim().split("\\s+"));
+                Collections.reverse(rules);
                 rulesForTerminal.put(inputSymbols.get(j),rules);
             }
 

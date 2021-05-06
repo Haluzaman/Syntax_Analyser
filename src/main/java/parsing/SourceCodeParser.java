@@ -32,7 +32,8 @@ public class SourceCodeParser {
             if(languageDefinition.isReservedWord(word)) {
                 result.add(word);
             } else {
-                result.addAll(Arrays.asList(word.split("(?!^)")));
+                var tokenizedWord = Arrays.stream(word.split("(?!^)")).map(String::toLowerCase).toList();
+                result.addAll(tokenizedWord);
             }
         }
 
