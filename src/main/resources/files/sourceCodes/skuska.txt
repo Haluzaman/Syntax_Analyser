@@ -6,7 +6,6 @@ BEGIN
     IF FALSE THEN WRITE ( False value in input );;
     WRITE ( SomeString , counter ) ;
 
-
     var := 60 - (100 + 20);
     IF (NOT TRUE) AND FALSE THEN var := var + 40;
     ELSE
