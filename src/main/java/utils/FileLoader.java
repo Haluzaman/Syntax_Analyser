@@ -2,8 +2,12 @@ package utils;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FileLoader {
 
@@ -17,6 +21,23 @@ public class FileLoader {
 
     public static File loadLangDefinitionFile() throws FileNotFoundException {
         return loadFile("files/definitions/SMALL_definitions.txt");
+    }
+
+    public static List<String> getSrcCodeFiles() {
+        List<String> allFiles = null;
+        try {
+            File f = loadFile("files/sourceCodes");
+            Stream<Path> walk = Files.walk(f.toPath());
+            allFiles = walk.filter(Files::isRegularFile)
+                    .map(p -> p.getFileName().toString()).collect(Collectors.toList());
+
+            allFiles.forEach(System.out::println);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return allFiles;
     }
 
     private static File loadFile(String name) throws FileNotFoundException {

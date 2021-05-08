@@ -32,114 +32,47 @@ public class Analyser {
         return false;
     }
 
-    public boolean analyse(String fileName) {
+    public AnalysisOutput analyse(String fileName) {
         loadFile(fileName);
-        return analyse();
+        return getResult(fileName);
     }
 
-    public boolean analyse() {
-        boolean retVal = true;
+    private AnalysisOutput getResult(String fileName) {
+        AnalysisOutput output = new AnalysisOutput(fileName);
+        boolean fileOk = true;
 
         Stack<String> stack = new Stack<>();
         stack.push("S"); //add starting terminal
         int currIndex = 0;
-        boolean shouldStop = false;
+        var currContent = new StackContent(stack.toString(), stack.peek(), "");
 
-//        //recover missing BEGIN/END
+        //recover missing BEGIN/END
         if(!tokens.contains("BEGIN")) {
-            System.out.println("Missing BEGIN, nevermind bro, I got you!");
             tokens.add(0, "BEGIN");
+            currContent.addInfo("BEGIN added!");
         }
         if(!tokens.contains("END")) {
-            System.out.println("Missing END, nevermind bro, I got you!");
             tokens.add( "END");
+            currContent.addInfo("END added!");
         }
 
-        while(!stack.isEmpty()) {
-            var currItem = stack.pop();
-            var currInput = tokens.get(currIndex);
+        output.addContent(currContent);
+        boolean result = analyse(stack, currIndex, tokens, definition, output);
+        output.setStatus(result);
+        return output;
 
-
-            //check wether we have same symbols on stack and in input
-            if(currItem.equals(currInput)) {
-                currIndex++;
-
-                //we reached end of input
-                if(currIndex == tokens.size()) {
-                    if(!stack.isEmpty()) retVal = false;
-                    break;
-                }
-
-                continue;
-            }
-
-            var rules = definition.getRuleList(currItem, currInput);
-            if(rules == null) {
-                //try recovering
-//
-                if(currItem.equals(";")) {
-                    System.out.println("*RECOVERING \";\"");
-                    stack.push(";");
-                    tokens.add(currIndex,";");
-                    continue;
-                } else if(currItem.equals(")")) {
-                    System.out.println("*RECOVERING \")\"");
-                    stack.push(")");
-                    tokens.add(currIndex,")");
-                    continue;
-                }
-
-                var hasSemicolon = definition.getRuleList(currItem, ";") != null;
-                var hasRightBracket = definition.getRuleList(currItem, ")") != null;
-                if(!hasSemicolon && !hasRightBracket) {
-                    retVal = false;
-                    break;
-                } else if(hasRightBracket && hasSemicolon) {
-                    //we have to check both
-                    tokens.add(currIndex, ")");
-                    var res = analyse(stack, currIndex, tokens);
-                    if(!res) {
-                        tokens.remove(currIndex);
-                    }
-                    var toAdd = currIndex;
-                    if(res) toAdd++;
-                    tokens.add(toAdd, ";");
-                    res = analyse(stack, currIndex, tokens);
-                    if(!res) {
-                        //cannot recover
-                        retVal = false;
-                        break;
-                    }
-
-                } else if(hasRightBracket) {
-                    System.out.println("RECOVERING SUMTING )");
-                    tokens.add(currIndex,")");
-                    continue;
-                } else if(hasSemicolon) {
-                    System.out.println("RECOVERING SUMTING ;");
-                    tokens.add(currIndex,";");
-                    continue;
-                }
-
-                System.out.println("AAAAAAAAAAAAAAAAA");
-                continue;
-            }
-
-            rules = rules.stream().filter(rule -> !rule.equals("&epsilon")).toList();
-            rules.forEach(stack::push);
-        }
-
-        return retVal;
     }
 
-    public boolean analyse(Stack<String> _stack, int currIndex, List<String> _t) {
+    public boolean analyse(Stack<String> _stack, int currIndex, List<String> _t, LanguageDefinition _definition, AnalysisOutput output) {
         boolean retVal = true;
-        System.out.println("VNORIL SOM SA KUA!");
         Stack<String> stack = new Stack<>();
         Collections.list(_stack.elements()).forEach(stack::push);
         List<String> _tokens = new ArrayList<>(_t);
 
+        StackContent s;
+
         while(!stack.isEmpty()) {
+            s = new StackContent(stack.toString(), stack.peek(), _tokens.get(currIndex));
             var currItem = stack.pop();
             var currInput = _tokens.get(currIndex);
 
@@ -153,65 +86,76 @@ public class Analyser {
                     if(!stack.isEmpty()) retVal = false;
                     break;
                 }
-
                 continue;
             }
 
-            var rules = definition.getRuleList(currItem, currInput);
+            var rules = _definition.getRuleList(currItem, currInput);
             if(rules == null) {
                     if(currItem.equals(";")) {
-                        System.out.println("*RECOVERING \";\"");
+                        s.addInfo("Adding \";\"");
                         stack.push(";");
                         _tokens.add(currIndex,";");
+                        output.addContent(s);
                         continue;
                     } else if(currItem.equals(")")) {
-                        System.out.println("*RECOVERING \")\"");
+                        s.addInfo("Adding \")\"");
                         stack.push(")");
                         _tokens.add(currIndex,")");
+                        output.addContent(s);
                         continue;
                     }
 
-                var hasSemicolon = definition.getRuleList(currItem, ";") != null;
-                var hasRightBracket = definition.getRuleList(currItem, ")") != null;
+                var hasSemicolon = _definition.getRuleList(currItem, ";") != null;
+                var hasRightBracket = _definition.getRuleList(currItem, ")") != null;
                 if(!hasSemicolon && !hasRightBracket) {
                     retVal = false;
                     break;
                 } else if(hasRightBracket && hasSemicolon) {
                     //we have to check both
-                    tokens.add(currIndex, ")");
-                    var res = analyse(stack, currIndex, tokens);
+                    s.addInfo("TRYING adding \")\" ");
+                    _t.add(currIndex, ")");
+                    var res = analyse(stack, currIndex, _t, _definition, output);
                     if(!res) {
-                        tokens.remove(currIndex);
+                        s.addInfo("COULD NOT ADD \")\" REMOVING");
+                        _t.remove(currIndex);
                     }
 
+                    s.addInfo("TRYING adding \")\" ");
                     var toAdd = currIndex;
                     if(res) toAdd++;
-                    tokens.add(toAdd, ";");
-                    res = analyse(stack, currIndex, tokens);
+                    _t.add(toAdd, ";");
+                    res = analyse(stack, currIndex, _t, _definition, output);
                     if(!res) {
                         //cannot recover
+                        s.addInfo("COULD NOT ADD \")\" REMOVING");
                         retVal = false;
+                        output.addContent(s);
                         break;
                     }
 
                 } else if(hasRightBracket) {
-                    System.out.println("RECOVERING SUMTING )");
+                    s.addInfo("ADDING \")\" ");
                     _tokens.add(currIndex,")");
+                    output.addContent(s);
                     continue;
-                } else if(hasSemicolon) {
-                    System.out.println("RECOVERING SUMTING ;");
+                } else {
+                    s.addInfo("ADDING adding \";\" ");
                     _tokens.add(currIndex,";");
+                    output.addContent(s);
                     continue;
                 }
 
-                System.out.println("AAAAAAAAAAAAAAAAA");
                 continue;
             }
 
+            s.addInfo("ADDING RULE: " + currItem + " " + "(" + currInput + ")" + " -> " + rules);
             rules = rules.stream().filter(rule -> !rule.equals("&epsilon")).toList();
             rules.forEach(stack::push);
+
+            output.addContent(s);
         }
-        System.out.println("Vynaram sa kundo!");
+
+
         return retVal;
     }
 

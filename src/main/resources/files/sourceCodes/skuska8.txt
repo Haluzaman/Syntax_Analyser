@@ -1,0 +1,10 @@
+BEGIN
+var := 10;
+var := var + 20;
+WRITE ( var );
+IF FALSE THEN
+  var := 1;
+ELSE
+  WRITE ( 1 );;
+
+END

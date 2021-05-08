@@ -1,0 +1,5 @@
+BEGIN
+    READ(input);
+    IF(TRUE) THEN output := 1 - (input + 20); ELSE output := input - 20;;
+    WRITE (output);
+END

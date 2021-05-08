@@ -1,0 +1,9 @@
+BEGIN
+var1 := 10;
+IF TRUE THEN
+  WRITE ( 100 );
+ELSE
+  WRITE ( var1 );;
+WRITE ( 500 );
+
+END

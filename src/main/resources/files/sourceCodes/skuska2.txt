@@ -1,0 +1,19 @@
+BEGIN
+   READ (id1, id2 , id3 , id4 );
+   SomeString := ( id1 + id2 + id3 + id4 ) ;
+   counter := 10;
+   IF NOT FALSE THEN counter := counter + 1;;
+   IF FALSE THEN WRITE ( False value in input );;
+   WRITE ( SomeString , counter ) ;
+
+
+   var := 60 - (100 + 20);
+   IF (NOT TRUE) AND FALSE THEN var := var + 40;
+   ELSE
+      IF FALSE OR TRUE THEN
+         READ (input);
+      ELSE
+         WRITE (This statement makes no sense);;;
+   id0 := 20;
+   WRITE (var, id0);
+END

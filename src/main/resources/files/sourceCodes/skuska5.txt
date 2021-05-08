@@ -1,0 +1,8 @@
+BEGIN
+READ(id1,id2, id3, id4);
+SomeString := (id1 + id2 + id3 + id4);
+counter := 1;
+IF NOT FALSE THEN counter := counter + 1;;
+IF FALSE THEN WRITE (False value in input);;
+WRITE(SomeString, counter);
+END

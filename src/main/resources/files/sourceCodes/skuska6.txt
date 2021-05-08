@@ -1,0 +1,13 @@
+BEGIN
+var := 60 - (100 + 20);
+IF (NOT TRUE) AND FALSE THEN
+var:= var + 40;
+ELSE
+  IF FALSE OR TRUE THEN
+     READ (input);
+  ELSE
+     WRITE (This statement makes no sense);;;
+id0 := 20;
+WRITE (var, id0);
+
+END

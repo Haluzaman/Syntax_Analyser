@@ -1,0 +1,5 @@
+BEGIN
+	READ(var);
+	var := var + 10;
+	WRITE ( var );
+END

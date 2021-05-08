@@ -1,0 +1,4 @@
+BEGIN
+	var : = 10;
+	IF TRUE WRITE (var);
+BEGIN

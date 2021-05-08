@@ -1,0 +1,5 @@
+BEGIN
+    READ(input);
+    output := (input + 5);
+    WRITE (output);
+END
